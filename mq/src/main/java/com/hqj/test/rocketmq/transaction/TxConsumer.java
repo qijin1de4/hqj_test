@@ -1,4 +1,4 @@
-package com.hqj.rocketmq.delay;
+package com.hqj.test.rocketmq.transaction;
 
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -7,30 +7,29 @@ import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import org.apache.rocketmq.common.message.MessageExt;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
-public class SomeConsumer {
+public class TxConsumer {
 
     public static void main(String[] args) throws Exception {
 
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer();
 
-        consumer.setConsumerGroup("delay_cg");
+        consumer.setConsumerGroup("tx_cg");
 
         consumer.setNamesrvAddr("jinmac.local:9876");
 
         consumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
 
-        consumer.subscribe("delayProducerTopic","*");
+        consumer.subscribe("txTopic1","*");
 
+        //设置消费模式为广播消费，默认为集群消费
+//        consumer.setMessageModel(MessageModel.BROADCASTING);
         consumer.registerMessageListener(new MessageListenerConcurrently() {
             @Override
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> list, ConsumeConcurrentlyContext consumeConcurrentlyContext) {
                 for(MessageExt msg : list) {
-                    System.out.print(new SimpleDateFormat("mm:ss").format(new Date()));
-                    System.out.println(", " + msg);
+                    System.out.println(msg);
                 }
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
@@ -38,6 +37,7 @@ public class SomeConsumer {
 
         consumer.start();
 
-        System.out.println("Delay consumer started!");
+        System.out.println("Consumer started!");
     }
+
 }

@@ -1,4 +1,4 @@
-package com.hqj.rocketmq.delay;
+package com.hqj.test.rocketmq.delay;
 
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
