@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocketDemoClient</title>
+</head>
+
+<body>
+
+
+
+<form onsubmit="return false">
+    <textarea id="message" style="height: 300px; width: 300px;"></textarea>
+    <input type="button" value="发送消息" onclick="send(this.form.message.value)" />
+    <textarea id="respTxt" style="height: 300px; width: 300px;"></textarea>
+    <input type="button" value="清空" onclick="document.getElementById('respTxt').value=''"/>
+</form>
+
+<script>
+    let socket;
+
+    if(window.WebSocket) {
+        socket = new WebSocket("ws://jinmac.local:4443/hello");
+
+        const rt = document.getElementById("respTxt");
+
+        // WebSocket收到服务段发来的消息
+        socket.onmessage = function(ev) {
+            rt.value = rt.value + "\n" + ev.data;
+
+        }
+
+        socket.onopen = function(ev) {
+            rt.value = "连接开启。。。。";
+        }
+
+        socket.onclose = function (ev) {
+            rt.value = rt.value + "\n" + "连接关闭！";
+        }
+    } else {
+        alert('当前浏览器不支持websocket')
+    }
+
+    function send(message) {
+        if(!window.WebSocket) {
+            return;
+        }
+
+        if(socket.readyState == WebSocket.OPEN) {
+            socket.send(message);
+        } else {
+            alert("websocket连接还没有开启！");
+        }
+    }
+</script>
+</body>
+</html>
