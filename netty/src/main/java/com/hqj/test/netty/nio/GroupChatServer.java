@@ -26,7 +26,7 @@ public class GroupChatServer {
             this.selector = Selector.open();
             serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
             while(true) {
-                if(selector.select(1000) == 0) {
+                if(selector.select() == 0) {
                     out.println("等待客户连接1秒钟!");
                     continue;
                 }
