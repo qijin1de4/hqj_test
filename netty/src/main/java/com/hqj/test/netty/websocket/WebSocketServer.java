@@ -44,6 +44,7 @@ public class WebSocketServer {
 
                             //ws://jinmcal.local:4443/hello
                             //WebSocket以帧为单位进行通信
+                            //WebSocketServerProtocolHandler将HTTP协议升级为WebSocket协议
                             ch.pipeline().addLast(new WebSocketServerProtocolHandler("/hello"));
 
                             ch.pipeline().addLast(new MyTextWebSocketFrameHandler());

@@ -1,0 +1,15 @@
+
+server:
+  port: 20881
+
+dubbo:
+  application:
+    name: demo-service-provider
+  registry:
+    protocol: zookeeper
+    address: 127.0.0.1:2181
+    check: false
+  protocol:
+    name: dubbo
+    #自用的dubbo协议端口
+    port: 20980
