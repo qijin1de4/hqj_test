@@ -63,6 +63,15 @@ public class AppTest {
     }
 
     @Test
+    public void findUser() {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", 694306028723896321L);
+        User user = userMapper.selectOne(queryWrapper);
+
+        System.out.println(user);
+    }
+
+    @Test
     public void addUDict() {
         IntStream.range(1,100).forEach(i -> {
             final UserDict userDict = new UserDict();

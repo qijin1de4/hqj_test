@@ -4,7 +4,7 @@ spring:
     allow-bean-definition-overriding: true
   shardingsphere:
     datasource:
-      names: m1,m2,m3
+      names: m1,m2,m3,s3
       m1:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: com.mysql.cj.jdbc.Driver
@@ -20,8 +20,14 @@ spring:
       m3:
         type: com.alibaba.druid.pool.DruidDataSource
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://localhost:3306/test2?serverTimezone=GMT%2B8
-        username: hqj
+        url: jdbc:mysql://localhost:33306/db_user?serverTimezone=GMT%2B8
+        username: root
+        password: admin
+      s3:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:33307/db_user?serverTimezone=GMT%2B8
+        username: root
         password: admin
     sharding:
       tables:
@@ -51,7 +57,7 @@ spring:
               algorithm-expression: course_$->{cid % 2 + 1}
         t_user:
           # 指定数据库分布情况与表的分布情况
-          actual-data-nodes: m$->{3}.t_user
+          actual-data-nodes: ds0.t_user
           key-generator:
             column: user_id
             type: SNOWFLAKE
@@ -62,6 +68,11 @@ spring:
               # cid 为偶数就添加到course_1表中
               # cid 为奇数就添加到course_2表中
               algorithm-expression: t_user
+      # 主从数据库读写分离配置
+      master-slave-rules:
+        ds0:
+          master-data-source-name: m3
+          slave-data-source-names: s3
       # 公共用户字典表配置
       broadcast-tables: t_udict
     props:
