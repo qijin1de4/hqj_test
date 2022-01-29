@@ -1,0 +1,69 @@
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  shardingsphere:
+    datasource:
+      names: m1,m2,m3
+      m1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/hqjtest?serverTimezone=GMT%2B8
+        username: hqj
+        password: admin
+      m2:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/test1?serverTimezone=GMT%2B8
+        username: hqj
+        password: admin
+      m3:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/test2?serverTimezone=GMT%2B8
+        username: hqj
+        password: admin
+    sharding:
+      tables:
+        t_udict:
+          key-generator:
+            column: dictid
+            type: SNOWFLAKE
+        course:
+          # 指定数据库分布情况与表的分布情况
+          actual-data-nodes: m$->{1..2}.course_$->{1..2}
+          key-generator:
+            column: cid
+            type: SNOWFLAKE
+          # 数据库分片策略
+          database-strategy:
+            inline:
+              sharding-column: user_id
+              # user_id为奇数走 m2
+              # user_id为偶数走 m1
+              algorithm-expression: m$->{user_id % 2 + 1}
+          # 表分片策略
+          table-strategy:
+            inline:
+              sharding-column: cid
+              # cid 为偶数就添加到course_1表中
+              # cid 为奇数就添加到course_2表中
+              algorithm-expression: course_$->{cid % 2 + 1}
+        t_user:
+          # 指定数据库分布情况与表的分布情况
+          actual-data-nodes: m$->{3}.t_user
+          key-generator:
+            column: user_id
+            type: SNOWFLAKE
+          # 表分片策略
+          table-strategy:
+            inline:
+              sharding-column: user_id
+              # cid 为偶数就添加到course_1表中
+              # cid 为奇数就添加到course_2表中
+              algorithm-expression: t_user
+      # 公共用户字典表配置
+      broadcast-tables: t_udict
+    props:
+      sql:
+        show: true
