@@ -1,0 +1,217 @@
+
+
+find ./ -name '*lastUpdated' -type f -exec echo {} \;
+
+# recursively find all files matching a pattern
+# grep : -l : instead of printing the matching text, outputs the matching file name 
+
+find ./ -type f -exec grep -i -l 'pattern' {} \;
+
+# get the size of a directory
+du -sh /path/to/directory
+
+# find xml files inside a zip with contents matching the pattern
+zipgrep '<artifact' yms-release-3.4.1.jar '*.xml'
+
+# list the files insde a jar 
+jar -tf abc.jar
+
+
+======= bash =======
+
+# read a file line by line
+
+cat $file | \
+	while read line; do
+	echo $line
+	done
+
+
+======= tmux =======
+
+# move panes in clock-wise direction :
+
+bind-key + ctl + o
+
+# attach to an exsiting session:
+tmux attach-session -t 0
+
+
+======= vim =======
+
+# vertically open a new pane for a file,  ctl+w+w / ctl+shit+w : to swith between panes
+:vert new path/to/file
+
+# horizontally open a new pane for a file
+:new path/to/file
+
+
+bind-key + ctl + o
+
+# attach to an exsiting session:
+tmux attach-session -t 0
+
+======= nginx =======
+-- 启动
+nginx -p `pwd`/ -c conf/nginx.conf
+-- mac 通过brew启动nginx后台服务
+brew services start/restart/stop nginx
+
+
+
+https://www.cyberciti.biz/faq/unix-linux-check-if-port-is-in-use-command/
+linux 查看端口监听
+
+测试环境启动etcd
+./etcd --name infra1 --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://10.10.150.36:2379
+
+
+======= MYSQL =======
+=== 查询所有主键为int的表
+
+select a.`TABLE_SCHEMA` as `TABLE_SCHEMA`, a.`TABLE_NAME` as `TABLE_NAME` FROM information_schema.`STATISTICS` a inner join information_schema.`COLUMNS` b
+on a.`TABLE_SCHEMA` = b.`TABLE_SCHEMA` AND a.`TABLE_NAME` = b.`TABLE_NAME` AND a.`COLUMN_NAME` = b.`COLUMN_NAME` AND a.`TABLE_SCHEMA` = 'diwork_wa_split' AND a.`INDEX_NAME` = 'PRIMARY' and b.`DATA_TYPE` = 'int';
+
+=== 查询所有的schema
+select schema_name as database_name from information_schema.schemata order by schema_name;
+
+=== 存储过程
+### 删除租户表的存储过程
+DELIMITER //
+DROP PROCEDURE if EXISTS `drop_tenant_tables`;
+## paramSchema 数据库名， paramTableNamePattern 表名匹配表达式
+CREATE procedure drop_tenant_tables(paramSchema varchar(100), paramTableNamePattern varchar(100)) 
+BEGIN
+	declare tenant_table varchar(100);
+	DECLARE s INT default 0;
+	declare tenant_tables cursor for select `table_name` from information_schema.`tables` where `table_schema` = paramSchema and table_name like paramTableNamePattern;
+	DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET s=1;
+	open tenant_tables;		
+		fetch tenant_tables into tenant_table;		
+		while s <> 1 DO
+			set @dro_tbl=concat('drop table ',paramSchema,'.',tenant_table,';');
+				##执行删除表操作
+			  prepare tmt from @dro_tbl;
+				EXECUTE tmt;
+				deallocate prepare tmt;
+			fetch tenant_tables into tenant_table;
+		end while;
+	close tenant_tables;
+END
+//
+DELIMITER ;
+## 例子
+call drop_tenant_tables('hqj', 'hqj_%');
+
+
+
+docker run --name hqj-api6-dashboard -v c:\hqj\conf\apisix-dashboard\conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml -v c:\hqj\conf\apisix-dashboard\schema.json:/usr/local/apisix-dashboard/conf/schema.json -v c:\hqj\conf\apisix-dashboard\tmp:/tmp -p 9000:9000 -d apache/apisix-dashboard
+
+
+docker run --name apisix-dashboard-test -v c:\hqj\conf\apisix-dashboard-test\conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml -v c:\hqj\conf\apisix-dashboard-test\schema.json:/usr/local/apisix-dashboard/conf/schema.json -v c:\hqj\conf\apisix-dashboard-test\tmp:/tmp -p 9020:9020 -d apache/apisix-dashboard
+
+
+docker run --name hqj-tomcat -v c:\hqj\conf\tomcat\data:/data -p 8008:8080 -d tomcat:jdk8-openjdk
+
+docker run --name cssbase -v /root/apps/:/data -p 8008:8080 -d tomcat:jdk8-arm
+
+docker run --name hqj-mongo -v  c:\hqj\conf\mongo\data:/data/db -p 27017:27017 -d mongo
+
+docker run --name hqj-nacos-server -e MODE=standalone -p 8848:8848 -d nacos/nacos-server
+
+curl http://10.10.150.39:9080/hello/rest/test/hello/ --cookie "cssSessionId=c5631296be29489c94e22bb870717816; Path=/;"
+
+# 执行jar包里的某个main方法
+java -cp fdfs-test-1.0-SNAPSHOT-jar-with-dependencies.jar com.css.FilesNotInBinLog /mnt/c/hqj/idea_projects/fdfs-test/target/data/ /opt/fastdfs/storage_base_local/data/sync/binlog.000
+
+
+Kafka
+
+docker run  -d --name kafka -p 9092:9092  --e KAFKA_ADVERTISED_HOST_NAME=192.168.56.1  -e KAFKA_ZOOKEEPER_CONNECT=192.168.56.1:2181 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://192.168.56.1:9092  -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 -e KAFKA_HEAP_OPTS="-Xmx256M -Xms128M" wurstmeister/kafka 
+
+kafka-manager
+docker run -it -d --rm  -p 9000:9000 -e ZK_HOSTS="192.168.56.1:2181" sheepkiller/kafka-manager
+
+postgres 
+docker run --name postgres_14 -e POSTGRES_HOST_AUTH_METHOD=trust -v c:\hqj\conf\postgres\data:/var/lib/postgresql/data -p 5432:5432 -d postgres:latest
+
+redis with password
+docker run -p 6379:6379 -v c:\hqj\conf\redis\data:/data --name redis_6 -d redis:6.2.6 redis-server --appendonly yes --requirepass "1234"
+
+dm8
+-v c:\hqj\conf\dm8\data:/opt/dmdbms/data
+
+docker run -p 5236:5236 -v c:\hqj\conf\dm8\data\PROD\dm.ini:/dm8/data/PROD/dm.ini  -v c:\hqj\conf\dm8\data\hqj:/dm8/hqj --name dm8 -d dm8:v01  /bin/bash /startDm.sh
+
+docker run -p 5236:5236 -v c:\hqj\conf\dm8\hqj:/opt/dmdbms/data --name dm8 -d dm8:v01  /bin/bash /startDm.sh
+
+./dimp USERID=SYSDBA/SYSDBA@localhost:5236 file=uim.dmp DIRECTORY=/opt/dmdbms/data FULL=y
+
+创建topic
+./kafka-topics.sh --create --zookeeper 192.168.56.1:2181 --replication-factor 1 --partitions 8 --topic test
+创建producer
+./kafka-console-producer.sh --broker-list 192.168.56.1:9092 --topic test
+创建consumer
+./kafka-console-consumer.sh --bootstrap-server 192.168.56.1:9092 --topic test --from-beginning
+
+windows显示某个监听端口
+
+netstat -ano | findstr 8089
+
+
+tar解压文件之后发现文件的所有者与权限掩码发生了变化，这是解压后的文件还是使用原机器的owner与权限导致的。
+--no-same-owner,  --no-same-permissions 来解决这个问题。
+
+通过PID 488 找到启动该process的程序
+tasklist /svc /FI "PID eq 488"
+
+杀死进程
+taskkill /F /PID 18076
+
+JVM参数设置java语音为英文
+-Duser.language=en -Duser.region=US
+
+
+创建多个目录
+mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+添加用户admin到组root
+usermod -a -G root admin
+
+Install google chrome on CentOS 7
+yum localinstall google-chrome-stable_current_x86_64.rpm
+
+you can start it either from the command line by typing google-chrome & 
+or by clicking on the Google Chrome icon (Applications → Internet → Google Chrome
+
+解决windows能看到samba共享文件夹，但点击进入却报告“没有权限的问题”
+https://serverfault.com/questions/395486/i-can-connect-to-samba-server-but-cannot-access-shares
+
+
+sudo docker run \
+> -p 6379:6379 \
+> -v $PWD/data:/data \
+> --name redis \
+> -d redis:3.2 redis-server --appendonly yes  --requirepass "__@picker-redis" 
+
+docker run -p 6379:6379 -v c:\hqj\conf\redis\data:/data --name redis_6 -d redis:6.2.6 redis-server --appendonly yes --requirepass "1234"
+
+bloom filter, count-min, hyperloglog
+
+
+分布式事务解决方案：Saga、XA、TCC、本地消息表等等，当然也有很多优秀的框架比如ByteTCC、TCC-transaction、EasyTransaction以及最近比较火的Seate
+
+XA协议分为两段提交和三段提交，XA是一个规范、协议，它只是定义了一系列的接口。
+
+非hup地后台其进程执行命令，并且std与err输出到同一个文件
+nohup xxx > result.txt 2>&1 &
+
+递归查找包含‘pattern'的文件
+grep -rnw '/path/to/somewhere/' -e 'pattern'
+-r or -R is recursive,
+-n is line number, and
+-w stands for match the whole word.
+-l (lower-case L) can be added to just give the file name of matching files.
+-e is the pattern used during the search
+
+解决通过翻墙clone github上的项目时报“OPENSSL connection was reset"错误的解决方案
+git config --global http.sslVerify "false"

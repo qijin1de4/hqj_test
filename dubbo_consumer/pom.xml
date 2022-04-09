@@ -3,13 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <groupId>com.hqj.test</groupId>
+    <parent>
+        <groupId>com.hqj.test</groupId>
+        <artifactId>hqj_test_projects</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../hqj_test_projects/pom.xml</relativePath>
+    </parent>
+
     <artifactId>dubbo_consumer</artifactId>
-    <version>1.0-SNAPSHOT</version>
+
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <spring-boot.version>2.3.4.RELEASE</spring-boot.version>
         <dubbo.version>2.7.8</dubbo.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
