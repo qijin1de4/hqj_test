@@ -7,5 +7,11 @@ spring:
     port: 5672
     username: admin
     password: admin
+  datasource:
+    url: jdbc:mysql://localhost:33306/hqj
+    username: root
+    password: admin
+    driver-class-name: com.mysql.jdbc.Driver
+
 server:
-  port: 8080
+  port: 7070

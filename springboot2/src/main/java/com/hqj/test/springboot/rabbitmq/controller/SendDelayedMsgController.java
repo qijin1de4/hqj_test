@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 import java.util.zip.DataFormatException;
 
-@RestController
-@RequestMapping("/delayedMsg")
+//@RestController
+//@RequestMapping("/delayedMsg")
 public class SendDelayedMsgController {
 
     private static final Logger log = LoggerFactory.getLogger(SendDelayedMsgController.class);
 
-    @Autowired
+    @Autowired(required = false)
     private RabbitTemplate rabbitTemplate;
 
     @GetMapping("/viaTTL/sendMsg/{message}")

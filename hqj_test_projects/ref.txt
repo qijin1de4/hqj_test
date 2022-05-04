@@ -26,6 +26,12 @@ cat $file | \
 	echo $line
 	done
 
+====== awk ========
+# 字符串拼接 
+gawk 'BEGIN { SQL="\""} {SQL=SQL $0 "\",\"" } END{print SQL}' platform_tables.txt
+
+# 转化列类型到元数据XML文件
+generate_meta_from_columns.awk -v xmlHeader='<?xml version="1.0" encoding="UTF-8"?> \n <components xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imeta.org/meta http://upsms.yonyouup.com/meta.xsd"> \n <component moduleName="" domain="yonbip-hr-paybiz" title="" name=""> \n <class tableName="" name="" title=""> \n <attributes>'  -v xmlFooter='\n </attributes> \n <generalizations> \n </generalizations> \n <realizations> \n </realizations> \n </component> \n </components>' wa_columns_without_header.txt
 
 ======= tmux =======
 
@@ -103,6 +109,43 @@ DELIMITER ;
 ## 例子
 call drop_tenant_tables('hqj', 'hqj_%');
 
+======= redis =======
+== 通过docker连接远程redis
+	1, 启动redis容器：docker run --name redis-cli -p 6379:6379 -d redis:7.0-rc3
+	2, 运行容器中的redis-cli：docker exec -it redis-container-name sh
+	3, 在容器中连接远程redis ：redis-cli -h 172.20.32.202 -p 6382 -a OSKwiPCQJxz0rDTm
+
+======= Maven =======
+## 展示项目中对个jar的依赖树
+mvn dependency:tree -Dincludes=org.projectlombok
+## 在依赖树中排除某些包
+mvn dependency:tree -Dexcludes=org.springframework.*,org.projectlombok
+## 输出依赖树到外部文件	
+mvn dependency:tree -DoutputFile=myFile.dot -DoutputType=dot
+## 展示实际POM
+ mvn help:effective-pom
+## 通过exec插件在当前项目依赖环境下执行某个Main类
+mvn exec:java -Dexec.mainClass=com.hqj.Main -Dexec.args="70112"
+## 在debug模式展示最终引用的dependencies
+mvn dependency:resolve -X
+## 检查POM情况，发现比如：代码用到但是pom中未引用的依赖，或者引用了但是未用到的依赖等
+mvn dependency:analyze
+## 展示目前active的profiles
+mvn help:active-profiles
+## 查看某个插件的详细信息
+mvn help:describe -Dcmd=compiler:compile -Ddetail
+
+
+依赖仲裁，条件装配，
+
+
+==== Spring
+@Primary Autowire bean的时候，如果有多个candidates，那么打了@Primary的bean优先。
+
+
+==== Java
+### NoClassDefFoundError
+Since NoClassDefFoundError was thrown, it means the class is there at compile time but at runtime, it cannot be resolved, usually due to version conflicts.
 
 
 docker run --name hqj-api6-dashboard -v c:\hqj\conf\apisix-dashboard\conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml -v c:\hqj\conf\apisix-dashboard\schema.json:/usr/local/apisix-dashboard/conf/schema.json -v c:\hqj\conf\apisix-dashboard\tmp:/tmp -p 9000:9000 -d apache/apisix-dashboard

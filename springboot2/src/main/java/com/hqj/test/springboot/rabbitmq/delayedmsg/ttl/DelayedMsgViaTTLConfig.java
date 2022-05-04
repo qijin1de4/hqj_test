@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
+//@Configuration
 public class DelayedMsgViaTTLConfig {
 
     private static final Logger log = LoggerFactory.getLogger(DelayedMsgViaTTLConfig.class);
