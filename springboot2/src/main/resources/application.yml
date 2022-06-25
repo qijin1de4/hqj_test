@@ -1,7 +1,15 @@
+server:
+  port: 7070
 
 spring:
   mvc:
     static-path-pattern: /static/**
+  redis:
+    url: redis://localhost:6379
+    lettuce:
+      pool:
+        max-active: 10
+        min-idle: 5
   rabbitmq:
     host: localhost
     port: 5672
@@ -11,7 +19,31 @@ spring:
     url: jdbc:mysql://localhost:33306/hqj
     username: root
     password: admin
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    max-active: 10
+    druid:
+      filters: 'stat,wall'
+      filter:
+        stat:
+          log-slow-sql: true
+          ## 慢SQL时间阈值
+          slow-sql-millis: 1000
+          enabled: true
+        wall:
+          enabled: true
+      stat-view-servlet:
+        enabled: true
+        login-password: admin
+        login-username: admin
+      web-stat-filter:
+        urlPattern: '/*'
+        exclusions: '*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*'
+        enabled: true
+      aop-patterns: com.hqj.test.*
 
-server:
-  port: 7070
+mybatis:
+  mapper-locations: 'classpath*:mybatis/**/*Mapper.xml,classpath*:mapper/**/*Mapper.xml'
+  #config-location: classpath:mybatis/mybatis-config.xml
+  # 通过以下的yml配置configuration
+  configuration:
+    map-underscore-to-camel-case: true

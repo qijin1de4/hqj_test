@@ -1,4 +1,4 @@
-package com.hqj.test.springboot.test;
+package com.hqj.test.springboot;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,9 @@ public class DbTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+//    @Autowired
+//    private StringRedisTemplate stringRedisTemplate;
+
     @Test
     public void jdbcTemplateTest() {
         Long count = jdbcTemplate.queryForObject("select count(*) from employee", Long.class);
@@ -21,8 +24,12 @@ public class DbTest {
         log.info("count is : " + count);
     }
 
-    @Test
-    public void simpleTest() {
-        log.info("hello");
-    }
+    //@Test
+//    public void redisTest() {
+//        ValueOperations<String, String> ops =
+//        stringRedisTemplate.opsForValue();
+//        ops.set("hqjtest", "hello");
+//
+//        log.info("hqjtest is " + ops.get("hqjtest"));
+//    }
 }

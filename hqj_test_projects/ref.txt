@@ -1,4 +1,5 @@
 
+0000121241
 
 find ./ -name '*lastUpdated' -type f -exec echo {} \;
 
@@ -26,6 +27,11 @@ cat $file | \
 	echo $line
 	done
 
+### nc connect to redis-server and executes commands
+	echo -e "*2\r\n\$4\r\nAUTH\r\n\$16\r\niJDo1UUjeUZxWaS0\r\n*1\r\n\$8\r\nFLUSHALL\r\n" | nc 172.20.35.229 6382
+	## execute redis command : set hqj xyz
+	echo '*3\r\n$3\r\nset\r\n$3\r\nhqj\r\n$3\r\nxyz\r\n' | nc 127.0.0.1 6379
+
 ====== awk ========
 # 字符串拼接 
 gawk 'BEGIN { SQL="\""} {SQL=SQL $0 "\",\"" } END{print SQL}' platform_tables.txt
@@ -51,17 +57,16 @@ tmux attach-session -t 0
 # horizontally open a new pane for a file
 :new path/to/file
 
-
-bind-key + ctl + o
-
-# attach to an exsiting session:
-tmux attach-session -t 0
+## 显示文件模式
+:set ff （fileformat=dos 表示这个是\r\n结尾的dos文件）
+:set ff=unix 将dos风格的换行变成unix风格的\n
 
 ======= nginx =======
 -- 启动
 nginx -p `pwd`/ -c conf/nginx.conf
 -- mac 通过brew启动nginx后台服务
 brew services start/restart/stop nginx
+
 
 
 
@@ -77,6 +82,9 @@ linux 查看端口监听
 
 select a.`TABLE_SCHEMA` as `TABLE_SCHEMA`, a.`TABLE_NAME` as `TABLE_NAME` FROM information_schema.`STATISTICS` a inner join information_schema.`COLUMNS` b
 on a.`TABLE_SCHEMA` = b.`TABLE_SCHEMA` AND a.`TABLE_NAME` = b.`TABLE_NAME` AND a.`COLUMN_NAME` = b.`COLUMN_NAME` AND a.`TABLE_SCHEMA` = 'diwork_wa_split' AND a.`INDEX_NAME` = 'PRIMARY' and b.`DATA_TYPE` = 'int';
+
+=== 查询所有包含bit类型字段的表
+
 
 === 查询所有的schema
 select schema_name as database_name from information_schema.schemata order by schema_name;
@@ -134,18 +142,59 @@ mvn dependency:analyze
 mvn help:active-profiles
 ## 查看某个插件的详细信息
 mvn help:describe -Dcmd=compiler:compile -Ddetail
-
+## 检查版本仲裁情况（-X打开debug模式） mvn dependency:resolve -X。 注意：<dependencyManagement>中的传递依赖也会影响版本仲裁结果
 
 依赖仲裁，条件装配，
 
 
 ==== Spring
 @Primary Autowire bean的时候，如果有多个candidates，那么打了@Primary的bean优先。
-
+RequestMappingHandlerMapping : @RequestMapping的匹配类
 
 ==== Java
+
+## clone指定的分支
+git clone --single-branch --branch develop http://git.xx.ccc/xx.git
+
 ### NoClassDefFoundError
 Since NoClassDefFoundError was thrown, it means the class is there at compile time but at runtime, it cannot be resolved, usually due to version conflicts.
+
+=== JavaScript
+实例对象的隐式原型 == 构造函数的显式原型; prototype是函数对象上才有的属性
+obj1 instanceof A
+	如果A的显式原型对象在a的隐式原型对象链上，那么该表达式就为true，否则false;
+变量提升、函数提升: 先执行变量提升，然后再执行函数提升，最后进行变量赋值（如果有变量赋值语句）。变量提升：在变量定义语句(必须是var定义的变量)之前就可以使用变量。
+	var c = 1;
+	function c(c) {
+		console.log(c)
+	}
+	c(2)
+执行上下文：
+	1，全局代码执行前，JS引擎会创建一个栈来管理所有执行上下文对象。
+	2，全局执行上下文（window）确定后，将其添加到栈中（压栈）
+	3，函数执行上下文创建后，将其添加到栈中（压栈）
+	4，当前函数执行完后，将栈顶对象移除（出栈）
+	4，但所有代码执行完毕后，栈中只剩下全局执行上下文window
+闭包产生的条件：1，函数包含子函数；2，子函数包含对外函数的调用；3，外函数执行。
+
+=== JavaScript6
+## () => {this} this对象是函数声明时的this对象
+
+
+=== Mac 
+# Be sure to change:
+# FOLDER_NAME   - the root folder name. 
+# ACTUAL_PATH_TO_REAL_FOLDER - the path to the "real" folder.
+# 
+#    Example: 
+#    "Drives    /Users/bob/Documents/Drives"
+#    .......^ this is tab (not spaces)
+
+sudo touch /etc/synthetic.conf
+sudo chmod 0777 /etc/synthetic.conf
+sudo echo "FOLDER_NAME  ACTUAL_PATH_TO_REAL_FOLDER" >> /etc/synthetic.conf
+sudo chmod 0644 /etc/synthetic.conf
+sudo chown root:wheel /etc/synthetic.conf
 
 
 docker run --name hqj-api6-dashboard -v c:\hqj\conf\apisix-dashboard\conf.yaml:/usr/local/apisix-dashboard/conf/conf.yaml -v c:\hqj\conf\apisix-dashboard\schema.json:/usr/local/apisix-dashboard/conf/schema.json -v c:\hqj\conf\apisix-dashboard\tmp:/tmp -p 9000:9000 -d apache/apisix-dashboard

@@ -121,16 +121,16 @@ public class ReadFileToXml {
 
     private static String getHeader(String tableName, String name) {
         StringBuffer sb = new StringBuffer();
-        sb.append(HEADER_AFTER_NAME + name).append(HEADER_AFTER_DOMAIN + "attend").append(HEADER_AFTER_TABLENAME + tableName)
+        sb.append(HEADER_AFTER_NAME + name).append(HEADER_AFTER_DOMAIN + "pay").append(HEADER_AFTER_TABLENAME + tableName)
                 .append(HEADER_END);
         return sb.toString();
     }
 
     public static void main(String[] args) throws IOException {
-        File srcFile = new File("C:/Users/liutao/Desktop/src");
+        File srcFile = new File("/Users/qijinhu/Documents/yonyou/mdd/wa_columns_without_header.txt");
 
         // 目标文件夹
-        String targetDir = "C:/Users/liutao/Desktop/test/";
+        String targetDir = "/Users/qijinhu/idea_projects/hqj_test/common/src/test/resources/";
         String fileName = null;
         BufferedWriter writer = null;
         BufferedReader bufferedReader = null;
@@ -171,7 +171,7 @@ public class ReadFileToXml {
                     Optional<String> reduce = Arrays.stream(tableName.split("_"))
                             .filter(v -> !"ts".equalsIgnoreCase(v)).reduce((a, b) -> a + b);
                     String name = reduce.get();
-                    fileName = "hrjq." + name + ".xml";
+                    fileName = "hrwa." + name + ".xml";
                     // 开始写下一个新文件
                     fileOutputStream = new FileOutputStream(new File(targetDir + fileName));
                     outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF-8");
