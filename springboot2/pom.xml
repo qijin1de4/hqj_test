@@ -100,6 +100,32 @@
             <artifactId>common</artifactId>
             <version>${app.version}</version>
         </dependency>
+
+
+        <!-- jndi -->
+
+        <!-- https://mvnrepository.com/artifact/com.sun.jndi/providerutil -->
+        <!-- maven仓库中已经找不到，需要手动安装 -->
+        <dependency>
+            <groupId>com.sun.jndi</groupId>
+            <artifactId>providerutil</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.sun.jndi/fscontext -->
+        <dependency>
+            <groupId>com.sun.jndi</groupId>
+            <artifactId>fscontext</artifactId>
+            <version>1.2-beta-3</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.sun.messaging.mq/fscontext -->
+        <dependency>
+            <groupId>com.sun.messaging.mq</groupId>
+            <artifactId>fscontext</artifactId>
+            <version>4.6-b01</version>
+        </dependency>
+
     </dependencies>
 
     <build>

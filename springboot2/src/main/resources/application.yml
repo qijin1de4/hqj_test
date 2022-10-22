@@ -43,7 +43,7 @@ spring:
 
 mybatis:
   mapper-locations: 'classpath*:mybatis/**/*Mapper.xml,classpath*:mapper/**/*Mapper.xml'
-  #config-location: classpath:mybatis/mybatis-config.xml
+  config-location: classpath:mybatis/mybatis-config.xml
   # 通过以下的yml配置configuration
-  configuration:
-    map-underscore-to-camel-case: true
+#  configuration:
+#    map-underscore-to-camel-case: true
