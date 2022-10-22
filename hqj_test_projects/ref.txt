@@ -17,6 +17,9 @@ zipgrep '<artifact' yms-release-3.4.1.jar '*.xml'
 # list the files insde a jar 
 jar -tf abc.jar
 
+# remove a file from a zip/war package
+zip -d abc.zip WEB-INF/lib/hrmix-pay-biz-5.1.0.jar
+
 
 ======= bash =======
 
@@ -31,6 +34,8 @@ cat $file | \
 	echo -e "*2\r\n\$4\r\nAUTH\r\n\$16\r\niJDo1UUjeUZxWaS0\r\n*1\r\n\$8\r\nFLUSHALL\r\n" | nc 172.20.35.229 6382
 	## execute redis command : set hqj xyz
 	echo '*3\r\n$3\r\nset\r\n$3\r\nhqj\r\n$3\r\nxyz\r\n' | nc 127.0.0.1 6379
+
+du -hcs /path/to/target/dir #展示制定目录的大小。
 
 ====== awk ========
 # 字符串拼接 
@@ -61,11 +66,12 @@ tmux attach-session -t 0
 :set ff （fileformat=dos 表示这个是\r\n结尾的dos文件）
 :set ff=unix 将dos风格的换行变成unix风格的\n
 
-======= nginx =======
+======= nginx/openresty =======
 -- 启动
 nginx -p `pwd`/ -c conf/nginx.conf
 -- mac 通过brew启动nginx后台服务
 brew services start/restart/stop nginx
+brew services start/restart/stop openresty
 
 
 
@@ -144,8 +150,12 @@ mvn help:active-profiles
 mvn help:describe -Dcmd=compiler:compile -Ddetail
 ## 检查版本仲裁情况（-X打开debug模式） mvn dependency:resolve -X。 注意：<dependencyManagement>中的传递依赖也会影响版本仲裁结果
 
+## Maven中没有的依赖，可以通过手动安装jar包添加到maven本地仓库。
+mvn install:install-file -DgroupId=javax.naming -DartifactId=jndi -Dversion=1.2.1 -Dpackaging=jar -Dfile=jndi-1_2_1.jar
 依赖仲裁，条件装配，
 
+mvn dependency:purge-local-repository clean install –U
+purge-local-repository：更新本地依赖库
 
 ==== Spring
 @Primary Autowire bean的时候，如果有多个candidates，那么打了@Primary的bean优先。
@@ -307,3 +317,32 @@ grep -rnw '/path/to/somewhere/' -e 'pattern'
 
 解决通过翻墙clone github上的项目时报“OPENSSL connection was reset"错误的解决方案
 git config --global http.sslVerify "false"
+
+
+======== Arthas
+
+options save-result true 开启日志输出 位置为/{user.home}/logs/arthas-cache
+
+java -jar /usr/local/bin/arthas-boot.jar
+
+ === 执行类的方法
+
+ sm -d com.yonyou.iuap.utils.PropertyUtil getPropertyByKey
+ 30257dd1
+ ognl -c 30257dd1 '@com.yonyou.iuap.utils.PropertyUtil@getPropertyByKey("domain.iuap-metadata-base")'
+ 
+
+
+业务：
+
+1，点击组织参照之后没有展示组织数据。
+	需要在 “数字化建模-权限管理-授权”节点下分配组织，MDD有大概5分钟的延迟。
+
+
+
+
+	1,WaPayfileItemSelectVo#payfileFormula 
+这个payfileFormula是干啥用的啊？本身它的父类WaSchemeItemVO就有 一个 formula属性
+
+======== RegularExpressions 正则表达式 
+insert.*bill_base(?!ytenant_id)* : 包含其他条件但是不包含ytenant_id的字符串
