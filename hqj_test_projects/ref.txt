@@ -31,11 +31,29 @@ cat $file | \
 	done
 
 ### nc connect to redis-server and executes commands
-	echo -e "*2\r\n\$4\r\nAUTH\r\n\$16\r\niJDo1UUjeUZxWaS0\r\n*1\r\n\$8\r\nFLUSHALL\r\n" | nc 172.20.35.229 6382
+	echo -e "*2\r\n\$4\r\nAUTH\r\n\$16\r\n1111111111111111\r\n*1\r\n\$8\r\nFLUSHALL\r\n" | nc 121.22.22.212 6301
+
 	## execute redis command : set hqj xyz
 	echo '*3\r\n$3\r\nset\r\n$3\r\nhqj\r\n$3\r\nxyz\r\n' | nc 127.0.0.1 6379
 
-du -hcs /path/to/target/dir #展示制定目录的大小。
+du -hcs /path/to/target/dir #展示指定目录的大小。
+
+查找指定jar文件并查找jar文件中指定文件名的文件
+
+	find ./ -name '*.jar' -type f -exec sh -c 'printf "\n\nFile: {}"; jar tf {}' ";" | less WaItemExtRefDataHandler
+
+	find ./ -name '*.jar' -type f -exec sh -c 'printf "\n\nFile: {}"; jar tf {}' ";" | grep HRBillContro	ller
+
+linux 查找监听端口
+netstat -ltnp | grep '8080' 
+
+# 多行输入
+cat << EOF > cat-out-put.txt
+start ${param}
+EOF
+
+# 查找A中有单B中没有的行
+find -x -v -f A B 或者 diff -u A B | grep -e '^¥+'
 
 ====== awk ========
 # 字符串拼接 
@@ -90,6 +108,8 @@ select a.`TABLE_SCHEMA` as `TABLE_SCHEMA`, a.`TABLE_NAME` as `TABLE_NAME` FROM i
 on a.`TABLE_SCHEMA` = b.`TABLE_SCHEMA` AND a.`TABLE_NAME` = b.`TABLE_NAME` AND a.`COLUMN_NAME` = b.`COLUMN_NAME` AND a.`TABLE_SCHEMA` = 'diwork_wa_split' AND a.`INDEX_NAME` = 'PRIMARY' and b.`DATA_TYPE` = 'int';
 
 === 查询所有包含bit类型字段的表
+=== 查询所有bill_base表中cbillno字段为ampub_location_tree的表
+
 
 
 === 查询所有的schema
@@ -163,8 +183,21 @@ RequestMappingHandlerMapping : @RequestMapping的匹配类
 
 ==== Java
 
+== 多线程
+	sleep: 保留锁， 释放CPU
+	wait:  
+	join:
+
+
 ## clone指定的分支
 git clone --single-branch --branch develop http://git.xx.ccc/xx.git
+git push <remote_name> :deleted_branch 将本地删除的分支同步到远程
+git push <remote_name> <commit_id>:refs/heads/<branch_name>  将本地的一个commit推送到相应remote上，如果remote上没有改分支将会创建。
+
+# 创建新分支并且checkout
+git switch -c new/branch/name;    git switch another/branch
+# 将pull代码同步由merge改为rebase
+git config --global pull.rebase true
 
 ### NoClassDefFoundError
 Since NoClassDefFoundError was thrown, it means the class is there at compile time but at runtime, it cannot be resolved, usually due to version conflicts.
@@ -221,6 +254,8 @@ docker run --name hqj-mongo -v  c:\hqj\conf\mongo\data:/data/db -p 27017:27017 -
 
 docker run --name hqj-nacos-server -e MODE=standalone -p 8848:8848 -d nacos/nacos-server
 
+ docker run -p 9000:9000 -p 9001:9001 --name minio-hqj -v /tmp/minio/data:/data quay.io/minio/minio server /data --console-address ':9001'
+
 curl http://10.10.150.39:9080/hello/rest/test/hello/ --cookie "cssSessionId=c5631296be29489c94e22bb870717816; Path=/;"
 
 # 执行jar包里的某个main方法
@@ -256,6 +291,10 @@ docker run -p 5236:5236 -v c:\hqj\conf\dm8\hqj:/opt/dmdbms/data --name dm8 -d dm
 创建consumer
 ./kafka-console-consumer.sh --bootstrap-server 192.168.56.1:9092 --topic test --from-beginning
 
+
+单机ES：
+docker run -d --name hqj-es-7.17.7 -v /Users/qijinhu/docker/elasticsearch/es7-single/plugins:/usr/share/elasticsearch/plugins -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" 60c7d96debc9
+
 windows显示某个监听端口
 
 netstat -ano | findstr 8089
@@ -272,6 +311,14 @@ taskkill /F /PID 18076
 
 JVM参数设置java语音为英文
 -Duser.language=en -Duser.region=US
+
+jstack -l PID : 不但展示线程堆栈情况还展示锁信息。
+jstack -l PID | grep 'java.lang.Thread.State: RUNNABLE' | wc -l #统计可运行状态线程状态
+
+① sleep：不释放锁、释放cpu
+② wait：释放锁、释放cpu
+③ yield：不释放锁、释放cpu
+④ join：释放锁、抢占cpu
 
 
 创建多个目录
@@ -321,17 +368,40 @@ git config --global http.sslVerify "false"
 
 ======== Arthas
 
+java -jar /usr/local/bin/arthas-boot.jar
+
 options save-result true 开启日志输出 位置为/{user.home}/logs/arthas-cache
 
 java -jar /usr/local/bin/arthas-boot.jar
 
  === 执行类的方法
+getstatic org.imeta.spring.support.cache.MetaRedisManager INIT_RETRY_TIMES -x 3
 
- sm -d com.yonyou.iuap.utils.PropertyUtil getPropertyByKey
+ognl -c 66bb880 -x 3 '#field=@org.imeta.spring.support.cache.MetaRedisManager@class.getDeclaredField("INIT_RETRY_TIMES"),#field.setAccessible(true),#field.set(null,-10)' 
+sc -d org.imeta.spring.support.cache.MetaRedisManager
+
+66bb880
+
+ognl -c 30257dd1
+
+ognl -c 66bb880 -x 3 '#field=@org.imeta.spring.support.cache.MetaRedisManager@class.getDeclaredField("INIT_RETRY_TIMES"),#field.setAccessible(true),#field.set(null,-10)' 
+
+getstatic org.imeta.spring.support.cache.MetaRedisManager INIT_RETRY_TIMES -x 3
+
+
+ognl -x 3 '@org.imeta.core.utils.MetadataPropertyUtil@getMetadataApiServer()'
+
+ sm -d org.imeta.core.utils.MetadataPropertyUtil getMetadataApiServer
  30257dd1
  ognl -c 30257dd1 '@com.yonyou.iuap.utils.PropertyUtil@getPropertyByKey("domain.iuap-metadata-base")'
- 
 
+
+ 抓取数据库账号密码
+
+ watch org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource * '{params,returnObj,throwExp}'  -n 5  -x 3
+
+ 
+/root/.arthas/lib/3.6.3/arthas/as.sh --select /app/yms
 
 业务：
 
@@ -346,3 +416,35 @@ java -jar /usr/local/bin/arthas-boot.jar
 
 ======== RegularExpressions 正则表达式 
 insert.*bill_base(?!ytenant_id)* : 包含其他条件但是不包含ytenant_id的字符串
+
+
+
+
+======== Apple tips and tricks
+
+option + command + space : brings up a finder search box.
+option + shift + k : inserts an apple log ()
+command + TAB to switches between running Apps in a mini Expose overlay, you can press [Q] to quit the selected App, because [Command] is actually holded. 
+Shift + Command ⌘ + 5，然后选取捕捉整个屏幕、App窗口或者特定区域。
+Option-Command-D: Show or hide the Dock
+Command–Mission Control: Show the desktop. 
+
+若要在不打开文件的情况下查看其预览，请选择文件，然后按下空格键。
+
+open ~/Library/Preferences/com.prect.NavicatPremium15.plist
+
+cd ~/Library/Application\ Support/PremiumSoft\ CyberTech/Navicat\ CC/Navicat\ Premium/
+
+
+======== 正则表达式
+
+^\s+`((?!COMMENT).)*$
+
+======= Nice Places in Beijing =====
+水库：珠窝 落坡岭 官厅 苇子
+
+
+data    /tmp/yms_data
+data/logs/app/yonbip-hr-bonus/yms.log   /dev/null
+data/logs/app/yonbip-hr-paybiz/yms.log  /dev/null
+data/logs/app/yonbip-hr-pay/yms.log     /dev/null
